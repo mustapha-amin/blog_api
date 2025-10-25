@@ -4,6 +4,8 @@ import { logger } from "./middlewares/logger.ts";
 import authRouter from "./modules/auth/auth.routes.ts";
 import { errorHandler } from "./middlewares/error_handler.ts";
 import rateLimit from "express-rate-limit";
+import usersRouter from "./modules/user/user.routes.ts";
+import blogRouter from "./modules/blog/blog.routes.ts";
 
 const app = express()
 const port = 3001;
@@ -21,6 +23,8 @@ app.use(
 
 connectDB().then(() => {
     app.use('/api/v1/auth/', authRouter)
+    app.use('/api/v1/users/', usersRouter)
+    app.use('/api/v1/blogs/', blogRouter)
     // app.use('/api/v1/todos/', authMiddleware, todoRouter)
     // app.use('/api/v1/users/', authMiddleware, authorize('admin'), usersRouter)
     // app.use(notFoundHandler)
