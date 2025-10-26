@@ -39,7 +39,7 @@ export const register = async (req:Request, res:Response) => {
         throw new BadRequestError("Please provide email and password")
     }
 
-    if(!registerSchema.safeParse(req.body)) {
+    if(!(registerSchema.safeParse(req.body)).success) {
         throw new BadRequestError("Invalid inputs")
     }
 
