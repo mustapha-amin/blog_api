@@ -2,6 +2,7 @@ import { type Request, type Response } from "express";
 import { BadRequestError } from "../../model/api_error.ts";
 import { BlogPost } from "./blog_model.ts";
 import { StatusCodes } from "http-status-codes";
+import { BlogComment } from "./comment_model.ts";
 
 export async function createBlogPost(req:Request, res: Response) {
     const {content} =  req.body;
@@ -23,5 +24,26 @@ export async function fetchPosts(_:Request, res: Response) {
     return res.status(StatusCodes.OK).json({
         message:"Posts fetched successfully",
         posts
+    })
+}
+
+export async function commentOnPost(req:Request, res: Response) {
+    const {content} = req.body;
+    const postId = req.params.id;
+
+    if(!content || !postId) {
+        throw new BadRequestError("Missing required parameters")
+    }
+
+    const post = await BlogPost.findOne({postId})
+
+    if(!post) {
+        throw new BadRequestError("Post with the specified id not found")
+    }
+
+    await BlogComment.create({postId, content})
+
+    return res.status(StatusCodes.CREATED).json({
+        message:"Comment created"
     })
 }
