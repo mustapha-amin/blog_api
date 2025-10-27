@@ -28,22 +28,32 @@ export async function fetchPosts(_:Request, res: Response) {
 }
 
 export async function commentOnPost(req:Request, res: Response) {
-    const {content} = req.body;
+    const {comment} = req.body;
     const postId = req.params.id;
+    const userId = req.user?.userId
 
-    if(!content || !postId) {
+    if(!comment || !postId) {
         throw new BadRequestError("Missing required parameters")
     }
 
-    const post = await BlogPost.findOne({postId})
+    const post = await BlogPost.findById(postId)
 
     if(!post) {
         throw new BadRequestError("Post with the specified id not found")
     }
 
-    await BlogComment.create({postId, content})
+    await BlogComment.create({postId, comment, userId})
 
     return res.status(StatusCodes.CREATED).json({
         message:"Comment created"
     })
+}
+
+export async function fetchPostComments(req:Request, res:Response) {
+     const postId = req.params.id;
+     if(!postId) {
+        throw new BadRequestError("Missing required parameters")
+     }
+
+     
 }

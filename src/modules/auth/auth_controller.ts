@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import { generateTokens } from "../../utils/auth_tokens_gen.ts";
 import { StatusCodes } from "http-status-codes";
 import { registerSchema } from "./auth_validator.ts";
+import bcrypt, { genSalt } from "bcryptjs";
 
 export const login = async (req: Request, res: Response) => {
     const {email, password} = req.body
@@ -19,6 +20,8 @@ export const login = async (req: Request, res: Response) => {
     }
 
     if(!(await user.comparePassword(password))) {
+        const salt = await genSalt(10);
+        const pass = await bcrypt.hash("Password123#", salt)
         throw new BadRequestError("Invalid password")
     }
 

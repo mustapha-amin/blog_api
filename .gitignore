@@ -17,3 +17,4 @@ jspm_packages/
 
 # typescript
 *.tsbuildinfo
+/src/config/seed_posts.ts

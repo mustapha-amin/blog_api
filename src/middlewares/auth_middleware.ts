@@ -17,12 +17,12 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
 
     try {
         const payload = jwt.verify(parts[1]!, ACCESS_SECRET_KEY!) as any
-        const userId = payload.userId;
-        const user = await User.findOne({userId})
+        const _id = payload.userId;
+        const user = await User.findById(_id)
         if(!user) {
             throw new NotFoundError("User doesn't exist")
         }
-        req.user = {userId, role: payload.role}
+        req.user = {userId: _id, role: payload.role}
         next()
     } catch (error) {
         console.log(error)

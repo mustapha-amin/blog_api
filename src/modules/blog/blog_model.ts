@@ -1,20 +1,15 @@
-import mongoose from "mongoose";
+import mongoose, {Schema, Document} from "mongoose";
 
-export interface IBlogPost {
-    postId: string,
-    userId: string,
+export interface IBlogPost extends Document{
+    userId: mongoose.Types.ObjectId,
     content: string,
 }
 
-export const BlogPostSchema = new mongoose.Schema<IBlogPost>({
-    postId: {
-        type: String,
-        default: crypto.randomUUID(),
-        required: true
-    },
+export const BlogPostSchema = new Schema<IBlogPost>({
     userId: {
-        type: String,
-        required: true
+        type: Schema.Types.ObjectId,
+        required: true,
+        ref: "User"
     },
     content: {
         type: String

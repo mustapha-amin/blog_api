@@ -1,26 +1,24 @@
-import mongoose from "mongoose"
+import mongoose, {Schema, Document} from "mongoose"
 
-export interface IBlogComment {
-    postId:string
-    commentId:string
+export interface IBlogComment extends Document{
+    postId:mongoose.Types.ObjectId
+    userId:mongoose.Types.ObjectId
     comment:string
-    userId:string
 }
 
 const BlogCommentSchema = new mongoose.Schema<IBlogComment>({
-    postId:String,
-    commentId:{
-        type:String,
-        default:crypto.randomUUID(),
+    postId:{
+        type: Schema.Types.ObjectId,
+        ref: "BlogPost"
     },
     comment: {
         type:String,
         required:true
     },
     userId:{
-        type:String,
-        required:true
-    }
+        type: Schema.Types.ObjectId,
+        ref: "User"
+    },
 }, {timestamps:true})
 
 export const BlogComment = mongoose.model("BlogComment", BlogCommentSchema)
