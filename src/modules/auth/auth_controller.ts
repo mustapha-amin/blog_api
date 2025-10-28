@@ -1,11 +1,10 @@
 import { type Request, type Response } from "express";
-import { BadRequestError, NotFoundError, UnauthorizedError } from "../../model/api_error.ts";
+import { BadRequestError, NotFoundError, UnauthenticatedError, UnauthorizedError } from "../../model/api_error.ts";
 import { User } from "../user/user_model.ts";
-import jwt from "jsonwebtoken";
-import { generateTokens } from "../../utils/auth_tokens_gen.ts";
+import { generateTokens, verifyRefreshToken } from "../../utils/auth_tokens_utils.ts";
 import { StatusCodes } from "http-status-codes";
 import { registerSchema } from "./auth_validator.ts";
-import bcrypt, { genSalt } from "bcryptjs";
+import type { ReqUser} from "../../types/request.js";
 
 export const login = async (req: Request, res: Response) => {
     const {email, password} = req.body
@@ -20,12 +19,12 @@ export const login = async (req: Request, res: Response) => {
     }
 
     if(!(await user.comparePassword(password))) {
-        const salt = await genSalt(10);
-        const pass = await bcrypt.hash("Password123#", salt)
         throw new BadRequestError("Invalid password")
     }
 
-    const tokens = generateTokens(user)        
+    const reqUser : ReqUser = {userId: user.id, role: user.role}
+
+    const tokens = generateTokens(reqUser)        
 
     user.refreshTokens.push(tokens.refresh)
     await user.save()
@@ -53,7 +52,9 @@ export const register = async (req:Request, res:Response) => {
     }
 
     const user = await User.create({email, password, username})
-    const tokens = generateTokens(user)
+    const reqUser : ReqUser = {userId: user.id, role: user.role}
+    const tokens = generateTokens(reqUser)
+    user.refreshTokens.push(tokens.refresh)
 
     return res.status(StatusCodes.CREATED).json({
         message:"user created successfully",
@@ -64,7 +65,7 @@ export const register = async (req:Request, res:Response) => {
 export const logout = async (req:Request, res:Response) => {
     const {refresh} = req.body
     if(!refresh) {
-        throw new UnauthorizedError("Refresh token missing")
+        throw new UnauthorizedError()
     }
 
      const user = await User.findOne({ refreshTokens: refresh });
@@ -80,5 +81,31 @@ export const logout = async (req:Request, res:Response) => {
     await user.save()
     return res.status(StatusCodes.OK).send({
             message:"Logged out successfully"
+    })
+}
+
+export const refresh = async (req:Request, res:Response) => {
+    const {refresh} = req.body;
+     if(!refresh) {
+        throw new UnauthenticatedError("Invalid or expired token")
+    }
+
+    const payload = verifyRefreshToken(refresh);
+
+    const user = await User.findById(payload.userId);
+
+    if(!user) {
+       throw new UnauthorizedError()
+    }
+    
+    const reqUser : ReqUser = {userId: user.id, role: user.role}
+    const access = generateTokens(reqUser).access
+
+    return res.status(StatusCodes.OK).send({
+        message: "tokens refreshed",
+        tokens:{
+            access,
+            refresh
+        }
     })
 }

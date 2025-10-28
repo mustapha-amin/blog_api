@@ -17,8 +17,8 @@ class NotFoundError extends ApiError {
 }
 
 class UnauthorizedError extends ApiError {
-    constructor(message:string) {
-        super(message, StatusCodes.UNAUTHORIZED)
+    constructor() {
+        super("invalid or expired token", StatusCodes.UNAUTHORIZED)
         Object.setPrototypeOf(this, UnauthorizedError.prototype)
     }
 }

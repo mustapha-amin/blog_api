@@ -1,12 +1,14 @@
+import type { IUser } from "../modules/user/user_model.ts";
+
 declare global {
   namespace Express {
     interface Request {
-      user?: User; 
+      user?: ReqUser; 
     }
   }
 }
 
-export type User = {
+export type ReqUser = {
   userId:string, 
   role:string
 }
