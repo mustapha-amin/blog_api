@@ -87,25 +87,27 @@ export const logout = async (req:Request, res:Response) => {
 export const refresh = async (req:Request, res:Response) => {
     const {refresh} = req.body;
      if(!refresh) {
-        throw new UnauthenticatedError("Invalid or expired token")
+        throw new UnauthorizedError()
     }
 
     const payload = verifyRefreshToken(refresh);
 
     const user = await User.findById(payload.userId);
-
+    
     if(!user) {
-       throw new UnauthorizedError()
+       throw new NotFoundError("User not found")
     }
     
     const reqUser : ReqUser = {userId: user.id, role: user.role}
-    const access = generateTokens(reqUser).access
+    
+    let newRefreshTokens = user?.refreshTokens.filter((token) => token !== refresh)
+    
+    const tokens = generateTokens(reqUser)
+    newRefreshTokens.push(tokens.refresh);
+    await User.findByIdAndUpdate(payload.userId, {refreshTokens:newRefreshTokens}, {new:true})
 
     return res.status(StatusCodes.OK).send({
         message: "tokens refreshed",
-        tokens:{
-            access,
-            refresh
-        }
+        tokens
     })
 }
