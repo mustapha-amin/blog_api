@@ -32,7 +32,7 @@ class BadRequestError extends ApiError {
 
 class UnauthenticatedError extends ApiError {
     constructor(message:string) {
-        super(message, StatusCodes.BAD_REQUEST)
+        super(message, StatusCodes.UNAUTHORIZED)
         Object.setPrototypeOf(this, BadRequestError.prototype)
     }
 }

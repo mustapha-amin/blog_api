@@ -1,11 +1,10 @@
-import z from "zod";
+import {z} from "zod";
 
 export const registerSchema = z.object({
     email: z
-        .email(),
-
+        .email({message:"invalid email"}),
     password: z
         .string()
-        .min(8)
-        .regex( /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/),
+        .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/, {message:"Invalid password"}),
+    username: z.string({message:"invalid username"})
 });

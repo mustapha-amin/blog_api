@@ -5,9 +5,9 @@ import { StatusCodes } from "http-status-codes";
 import { BlogComment } from "./comment_model.ts";
 
 export async function createBlogPost(req: Request, res: Response) {
-    const { content } = req.body;
+    const { content, title } = req.body;
 
-    if (!content) {
+    if (!content || !title) {
         throw new BadRequestError("Missing required parameters")
     }
     const userId = req.user?.userId
@@ -24,6 +24,7 @@ export async function fetchPosts(_: Request, res: Response) {
         const user = post.userId as any
         return {
             id: post.id,
+            title: post.title,
             user: {
                 id: user.id,
                 username: user.username,

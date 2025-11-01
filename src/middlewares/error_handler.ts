@@ -27,5 +27,5 @@ export function errorHandler(
     const logLevel = statusCode >= 500 ? 'error' : 'warn';
     console.log(` ${logLevel} ${req.method} ${req.url} - ${statusCode}: ${errorMessage}`);
     console.log(err)
-    return res.status(statusCode).send({message:errorMessage})
+    return res.status(statusCode).send({error:errorMessage})
 }
