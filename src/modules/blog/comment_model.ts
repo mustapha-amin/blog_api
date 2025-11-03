@@ -4,12 +4,13 @@ export interface IBlogComment extends Document{
     postId:mongoose.Types.ObjectId
     userId:mongoose.Types.ObjectId
     comment:string
+    createdAt:Date
+    updatedAt:Date
 }
 
 const BlogCommentSchema = new mongoose.Schema<IBlogComment>({
     postId:{
         type: Schema.Types.ObjectId,
-        ref: "BlogPost"
     },
     comment: {
         type:String,

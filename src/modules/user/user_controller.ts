@@ -24,7 +24,7 @@ export async function deleteUser(req: Request, res: Response) {
 }
 
 export async function fetchUsers(_: Request, res: Response) {
-	const users = await User.find({}).select('email username role createdAt updatedAt');
+	const users = await User.find({}).select('id email username role createdAt updatedAt');
 
 	return res.status(StatusCodes.OK).json({
 		message: "Users fetched successfully",
@@ -38,13 +38,13 @@ export async function fetchUserById(req: Request, res: Response) {
         throw new BadRequestError("Missing user id")
     }
 
-    const user = await User.findById(id).select('email username role createdAt updatedAt');
+    const user = await User.findById(id).select('id email username role createdAt updatedAt');
     if(!user) {
         throw new NotFoundError("User not found")
     }
 
     return res.status(StatusCodes.OK).json({
-		message: "Users fetched successfully",
-		user
+		message: "User fetched successfully",
+		user:user
 	})
 }

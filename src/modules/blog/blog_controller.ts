@@ -11,7 +11,7 @@ export async function createBlogPost(req: Request, res: Response) {
         throw new BadRequestError("Missing required parameters")
     }
     const userId = req.user?.userId
-    await BlogPost.create({ userId, content })
+    await BlogPost.create({ userId, content, title })
 
     return res.status(StatusCodes.CREATED).json({
         message: "post created successfully"
@@ -63,10 +63,30 @@ export async function commentOnPost(req: Request, res: Response) {
 }
 
 export async function fetchPostComments(req: Request, res: Response) {
-    const postId = req.params.id;
-    if (!postId) {
-        throw new BadRequestError("Missing required parameters")
+  const { postId } = req.params;
+  if (!postId) {
+    throw new BadRequestError("Missing required parameters");
+  }
+
+  const fetchedComments = await BlogComment.find({ postId }).populate('userId', 'username _id');
+
+  const comments = fetchedComments.map((comment) => {
+    const user = comment.userId as any
+    return {
+        id:comment.id,
+        postId,
+        comment,
+        user: {
+            id: user.id,
+            username:user.username
+        },
+        createdAt: comment.createdAt,
+        updatedAt: comment.updatedAt
     }
+  })
 
-
+  return res.status(StatusCodes.OK).send({
+    message: "Comments fetched successfully",
+    comments,
+  });
 }
