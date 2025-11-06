@@ -55,10 +55,11 @@ export async function commentOnPost(req: Request, res: Response) {
         throw new BadRequestError("Post with the specified id not found")
     }
 
-    await BlogComment.create({ postId, comment, userId })
-
+   const newComment = await BlogComment.create({ postId, comment, userId })
+    
     return res.status(StatusCodes.CREATED).json({
-        message: "Comment created"
+        message: "Comment created",
+        comment : newComment.toJSON()
     })
 }
 
